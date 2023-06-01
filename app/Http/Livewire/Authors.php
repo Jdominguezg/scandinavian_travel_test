@@ -4,15 +4,18 @@ namespace App\Http\Livewire;
 
 use App\Models\Author;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class Authors extends Component
 {
+    use WithPagination;
+
     public $author_id, $name, $age;
     public $isOpen = 0;
 
     public function render()
     {
-        $authors = Author::all();
+        $authors = Author::orderBy('id', 'DESC')->paginate(15);
 
         return view('livewire.authors', ['authors' => $authors]);
     }

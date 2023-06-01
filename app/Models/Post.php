@@ -9,6 +9,8 @@ class Post extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['title', 'slug'];
+
     public function images()
     {
         return $this->morphMany(Image::class, 'imageable');

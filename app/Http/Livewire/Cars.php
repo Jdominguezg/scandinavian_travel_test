@@ -4,15 +4,18 @@ namespace App\Http\Livewire;
 
 use App\Models\Car;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class Cars extends Component
 {
+    use WithPagination;
+
     public $car_id, $brand, $model;
     public $isOpen = 0;
 
     public function render()
     {
-        $cars = Car::all();
+        $cars = Car::orderBy('id', 'DESC')->paginate(15);
 
         return view('livewire.cars', ['cars' => $cars]);
     }
