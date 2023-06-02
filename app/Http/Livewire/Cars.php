@@ -34,7 +34,7 @@ class Cars extends Component
     public function closeModal()
     {
         $this->isOpen = false;
-
+        $this->resetValidation();
     }
 
     private function resetInputFields(){

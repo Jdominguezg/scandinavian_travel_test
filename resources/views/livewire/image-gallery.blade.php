@@ -13,7 +13,7 @@
                 class="material-symbols-rounded h-[25px] w-[25px] text-[12px] bg-blue-500 shadow-md flex flex-wrap justify-center items-center rounded-full">arrow_back_ios_new</span>
             <p class="text-[12px]">{{$ig_back_text}}</p>
         </div>
-        @if(count($images) > 0)
+        @if($images && isset($images) && count($images) > 0)
             <div class="grid grid-cols-3 gap-[48px] w-full h-full overflow-y-auto">
                 @foreach ($images as $image)
                     <div class="relative h-[300px] rounded-[8px] shadow-lg overflow-hidden">
@@ -40,57 +40,83 @@
                     </div>
                 @endforeach
             </div>
-            <label for="images" class="absolute bottom-[-56px] left-0 flex flex-wrap gap-2">
-                <div class="rounded-[8px] bg-white text-white bg-opacity-20 border-0 flex items-center pl-2 w-[312px]">
+
+            <label for="images-{{$instance->id}}"
+                   class="absolute bottom-[-56px] left-0 flex flex-wrap items-center gap-2">
+                <div
+                    class="rounded-[8px] bg-white h-[40px] text-white bg-opacity-20 border-0 flex items-center pl-2 w-[312px]">
                     Text
                 </div>
                 <div
-                    class="h-[42px] rounded-full w-[176px] bg-[#3F54D1] flex justify-center items-center text-white shadow-lg">
+                    class="cursor-pointer h-[42px] rounded-full w-[176px] bg-[#3F54D1] flex justify-center items-center text-white shadow-lg">
                     UPLOAD
                 </div>
+                @if($errors->has('uploading_images.*'))
+                    <small class="text-[#ff9f9f]">{{$errors->first('uploading_images.*')}}</small>
+                @endif
 
             </label>
-            <input id="images" class="hidden" type="file" wire:model="images" multiple
+            <input id="images-{{$instance->id}}" class="hidden" type="file" wire:model="uploading_images"
                    accept=".jpg,.jpeg,.png,.gif,.svg,.webp">
 
         @else
-            <label for="images"
-                   class="cursor-pointer w-full h-full flex flex-wrap justify-center items-center text-white rounded-[16px] border-[5px] border-dashed border-white border-opacity-50">
-                <div x-show="isUploading">
-                    <progress max="100" x-bind:value="progress"></progress>
-                    <div wire:loading wire:target="updatedImage">Guardando...</div>
-                    <div wire:loading.remove wire:target="updatedImage">Guardando...</div>
-                </div>
+            <form class="w-full h-full">
+                <label for="images-{{$instance->id}}"
+                       class="cursor-pointer w-full h-full flex flex-wrap justify-center items-center text-white rounded-[16px] border-[5px] border-dashed border-white border-opacity-50">
+                    <div x-show="isUploading">
+                        <progress max="100" x-bind:value="progress"></progress>
+                        <div wire:loading wire:target="updatedUploadImages">Guardando...</div>
+                        <div wire:loading.remove wire:target="updatedUploadImages">Guardando...</div>
+                    </div>
 
-                <div x-show="!isUploading" class="text-center">
-                    <span class="material-symbols-rounded w-full text-[64px]">add_photo_alternate</span>
-                    <p class="w-full">Haz click para seleccionar las imágenes</p>
-                    <small class="w-full">Formatos soportados (.jpg, .jpeg, .png, .gif, .svg, .webp)</small>
-                </div>
-                <input id="images" class="hidden" type="file" wire:model="images" x-ref="dropZone" multiple
-                       accept=".jpg,.jpeg,.png,.gif,.svg,.webp">
-            </label>
+                    <div x-show="!isUploading" class="text-center">
+                        <span class="material-symbols-rounded w-full text-[64px]">add_photo_alternate</span>
+                        <p class="w-full">Haz click para seleccionar las imágenes</p>
+                        <small class="w-full">Formatos soportados (.jpg, .jpeg, .png, .gif, .svg, .webp)</small>
+                        @if($errors->has('uploading_images.*'))
+                            <br><small class="text-[#ff9f9f]">{{$errors->first('uploading_images.*')}}</small>
+                        @endif
+                    </div>
 
-        @endif
+                    <input id="images-{{$instance->id}}" class="hidden" type="file" wire:model="uploading_images"
+                           multiple
+                           accept=".jpg,.jpeg,.png,.gif,.svg,.webp">
+                </label>
 
 
-    </div>
-    @if($selectedImage)
-        <div
-            class="fixed top-0 left-0 w-full h-full z-11 bg-black bg-opacity-80 backdrop-filter backdrop-blur-[5px] flex justify-center items-center">
-            <div
-                class="relative text-white w-[560px] h-[385px] rounded-[8px] bg-white bg-opacity-20 backdrop-filter backdrop-blur-[25px] p-[64px]">
-                    <span wire:click="close" class="cursor-pointer absolute top-[18px] right-[18px] material-symbols-rounded">
+            </form>
+            @endif
+
+
+            </small>
+            @if($selectedImage)
+                <div
+                    class="fixed top-0 left-0 w-full h-full z-11 bg-black bg-opacity-80 backdrop-filter backdrop-blur-[5px] flex justify-center items-center">
+                    <div
+                        class="relative text-white w-[560px] h-[385px] rounded-[8px] bg-white bg-opacity-20 backdrop-filter backdrop-blur-[25px] p-[64px]">
+                    <span wire:click="close"
+                          class="cursor-pointer absolute top-[18px] right-[18px] material-symbols-rounded">
                         close
                     </span>
 
-                <h3 class="w-full mb-12">Image: {{$selectedImage->id}}</h3>
-                <div class="pl-8 flex flex-wrap gap-4">
-                    <label class="w-full flex justify-between">Name <input class="w-80 bg-white bg-opacity-20 rounded-[8px]" type="text" wire:model="name"></label>
-                    <label class="w-full flex justify-between">Alt <input class="w-80 bg-white bg-opacity-20 rounded-[8px]" type="text" wire:model="alt"></label>
+                        <h3 class="w-full mb-12">Image: {{$selectedImage->id}}</h3>
+                        <div class="pl-8 flex flex-wrap gap-4">
+                            <label class="w-full flex justify-between">Name <input
+                                    class="w-80 bg-white bg-opacity-20 rounded-[8px]" type="text"
+                                    wire:model="name"></label>
+                            <label class="w-full flex justify-between">Alt <input
+                                    class="w-80 bg-white bg-opacity-20 rounded-[8px]" type="text"
+                                    wire:model="alt"></label>
+                        </div>
+                        <div class="flex flex-wrap gap-8 mt-12 items-center justify-center">
+                            <button class=" h-[42px] w-[176px] rounded-full shadow-md text-white bg-[#3F54D1]"
+                                    wire:click="save">Save
+                            </button>
+                            @if($errors->has('name'))
+                                <small class="text-[#ff9f9f]">{{$errors->first('name')}}</small>
+                            @endif
+                        </div>
+                    </div>
                 </div>
-                <button class="mt-12 h-[42px] w-[176px] rounded-full shadow-md text-white bg-[#3F54D1]" wire:click="save">Save</button>
-            </div>
-        </div>
-    @endif
-</div>
+                @endif
+                </small>

@@ -4,6 +4,7 @@ namespace App\Http\Livewire;
 
 use App\Models\Image;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -16,6 +17,7 @@ class ImageGallery extends Component
     public $ig_back_text;
 
     public $images = [];
+    public $uploading_images = [];
     public $image;
     public $selectedImage = null;
     public $name;
@@ -23,9 +25,7 @@ class ImageGallery extends Component
     public $isFavorite;
 
 
-    protected $rules = [
-        'images.*' => 'image|max:2048',
-    ];
+
 
     public function mount($instance)
     {
@@ -38,11 +38,13 @@ class ImageGallery extends Component
         return view('livewire.image-gallery');
     }
 
-    public function updatedImages()
+    public function updatedUploadingImages()
     {
-        $this->validate();
+        $this->validate([
+            'uploading_images.*' => 'required|image|max:2048'
+        ]);
         $instance_name = class_basename($this->instance);
-        foreach ($this->images as $image) {
+        foreach ($this->uploading_images as $image) {
             $imageName = $image->getClientOriginalName();
             $path = $image->storeAs("public/images/$instance_name", $imageName);
 
@@ -79,12 +81,12 @@ class ImageGallery extends Component
             'name' => 'required',
         ]);
 
-        if($this->name !== $this->selectedImage->name){
+        if ($this->name !== $this->selectedImage->name) {
 
 
             $newPath = str_replace($this->selectedImage->name, $this->name, $this->selectedImage->path);
 
-            if(Storage::move($this->selectedImage->path, $newPath)){
+            if (Storage::move($this->selectedImage->path, $newPath)) {
                 $this->selectedImage->update([
                     'name' => $this->name,
                     'alt' => $this->alt,
@@ -92,7 +94,7 @@ class ImageGallery extends Component
                 ]);
             }
 
-        }else{
+        } else {
             $this->selectedImage->update([
                 'alt' => $this->alt,
             ]);
@@ -103,8 +105,12 @@ class ImageGallery extends Component
         $this->instance->refresh();
     }
 
-    public function close(){
+    public function close()
+    {
+        $this->resetValidation();
         $this->selectedImage = null;
+        $this->images = $this->instance->images()->get();
+        $this->instance->refresh();
     }
 
 
