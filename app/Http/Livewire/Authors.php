@@ -73,7 +73,12 @@ class Authors extends Component
 
     public function delete($id)
     {
-        Author::find($id)->delete();
+        $author = Author::find($id);
+        foreach($author->images as $image){
+            unlink(storage_path('app/' . $image->path));
+            $image->delete();
+        }
+        $author->delete();
         session()->flash('message', 'Autor eliminado correctamente.');
     }
 }

@@ -73,7 +73,12 @@ class Posts extends Component
 
     public function delete($id)
     {
-        Post::find($id)->delete();
+        $post = Post::find($id);
+        foreach($post->images as $image){
+            unlink(storage_path('app/' . $image->path));
+            $image->delete();
+        }
+        $post->delete();
         session()->flash('message', 'Post eliminado correctamente.');
     }
 }

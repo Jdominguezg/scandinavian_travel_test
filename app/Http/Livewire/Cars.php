@@ -74,7 +74,12 @@ class Cars extends Component
 
     public function delete($id)
     {
-        Car::find($id)->delete();
+        $car = Car::find($id);
+        foreach($car->images as $image){
+            unlink(storage_path('app/' . $image->path));
+            $image->delete();
+        }
+        $car->delete();
         session()->flash('message', 'Vehículo eliminado correctamente.');
     }
 }
