@@ -24,7 +24,7 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
     </head>
 
-    <body>
+    <body class="p-8">
         @yield('body')
     </body>
 </html>

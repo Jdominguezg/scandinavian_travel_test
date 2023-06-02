@@ -41,7 +41,6 @@
                                             ig_title="Image Gallery for Car: {{$car->brand}} {{$car->model}}"
                                             ig_back_text="Back To Cars List"
                                             :wire:key="$car->id"
-                                            open="true"
                     />
                 </td>
 

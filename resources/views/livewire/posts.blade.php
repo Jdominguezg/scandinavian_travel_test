@@ -18,13 +18,20 @@
         </thead>
         <tbody>
         @foreach($posts as $post)
-            <tr>
-                <td class="border px-4 py-2">{{ $post->id }}</td>
-                <td class="border px-4 py-2">{{ $post->title }}</td>
-                <td class="border px-4 py-2">{{ $post->slug }}</td>
+            <tr x-data="{open: false}" @close-gallery="open = false" class="hover:bg-gray-200">
+                <td @click="open = !open" class="border px-4 py-2 cursor-pointer">{{ $post->id }}</td>
+                <td @click="open = !open" class="border px-4 py-2 cursor-pointer">{{ $post->title }}</td>
+                <td @click="open = !open" class="border px-4 py-2 cursor-pointer">{{ $post->slug }}</td>
                 <td class="border px-4 py-2">
                     <button wire:click="edit({{ $post->id }})" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Editar</button>
                     <button wire:click="delete({{ $post->id }})" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Eliminar</button>
+                </td>
+                <td x-show="open" wire:load="loadImages({{$post->id}})">
+                    <livewire:image-gallery :instance="$post"
+                                            ig_title="Image Gallery for Post: {{$post->title}}"
+                                            ig_back_text="Back To Posts List"
+                                            :wire:key="$post->id"
+                    />
                 </td>
             </tr>
         @endforeach
