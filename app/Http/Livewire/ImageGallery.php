@@ -45,7 +45,8 @@ class ImageGallery extends Component
         ]);
         $instance_name = class_basename($this->instance);
         foreach ($this->uploading_images as $image) {
-            $imageName = $image->getClientOriginalName();
+            $imageName = uniqid().'_'.$image->getClientOriginalName();
+
             $path = $image->storeAs("public/images/$instance_name", $imageName);
 
             $this->instance->images()->create([
@@ -83,6 +84,15 @@ class ImageGallery extends Component
 
         if ($this->name !== $this->selectedImage->name) {
 
+            $instance_name = class_basename($this->instance);
+
+            /**
+             * Comprobamos que el nombre es único en la relación polimórfica para evitar problemas a la hora de editarlos o eliminarlos
+             * si existe el nombre del fichero le añadimos un uniqid para evitar problemas.
+            */
+            if(Image::where('imageable_type', '=', get_class($this->instance))->where('imageable_id', '=', $this->instance->id)->where('name', '=', $this->name)->count() != 0){
+                 $this->name = uniqid().'_'.$this->name;
+            }
 
             $newPath = str_replace($this->selectedImage->name, $this->name, $this->selectedImage->path);
 

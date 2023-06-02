@@ -56,7 +56,7 @@
                 @endif
 
             </label>
-            <input id="images-{{$instance->id}}" class="hidden" type="file" wire:model="uploading_images"
+            <input id="images-{{$instance->id}}" class="hidden" multiple type="file" wire:model="uploading_images"
                    accept=".jpg,.jpeg,.png,.gif,.svg,.webp">
 
         @else
